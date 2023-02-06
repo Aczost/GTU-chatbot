@@ -111,11 +111,38 @@ async function fetchStudentDetails(enr) {
   return studDetails;
 }
 
-async function fetchCourseDetails(branch) {
-  const courseDetails = await courseModel.find({ branch });
-  return courseDetails;
+async function fetchCourseDetails(branch,paper=false) {
+  const courseDetails = await courseModel.find({ branch:branch.toUpperCase()});
+  console.log(courseDetails);
+  const { desc, companies, colleges, papers } = courseDetails[0];
+  let str = "";
+  if (paper) {
+    papers.forEach((el) => (str += "\n" + el.year + "\n" + el.link+"\n"));
+    str+= "\n\nPress # to go back!👈"
+    return str;
+  } else {
+    str += desc;
+    companies.forEach(
+      (el) => (str += "\n" + el.name + "\n" + el.size + "\n" + el.link + "\n")
+    );
+    colleges.forEach(
+      (el) =>
+        (str +=
+          "\n" +
+          el.name +
+          "\n" +
+          el.ownership +
+          "\n" +
+          el.established +
+          "\n" +
+          el.link +
+          "\n" +
+          el.fees+"\n")
+    ); 
+    str+= "\n\nPress # to go back!👈"
+    return str;
+  }
 }
-
 // READING COURSE-BRANCH JSON FILE
 // let courseData = {};
 // const jsonStringCourse = fs.readFileSync(
@@ -132,7 +159,7 @@ async function fetchCourseDetails(branch) {
 
 const client = new Client({
   authStrategy: new LocalAuth(),
-  puppeteer: { headless: false }
+  // puppeteer: { headless: false }
 });
 
 client.initialize();
@@ -302,35 +329,28 @@ client.on("message", async (message) => {
         break;
 
       case "CE":
-        let ceDetails = await fetchCourseDetails("CE");
-        ceDetails = ceDetails[0];
-
-        let messages = ceDetails.companies.map(c => c);
-        message.reply(ceDetails.desc+ "\n"+ messages  + "\nPress # to go back!👈").toString();
+        let ceDetails = await fetchCourseDetails("CE",);
+        message.reply(ceDetails)
         break;
 
       case "IT":
-        let itDetails = await fetchCourseDetails("IT");
-        itDetails = itDetails[0];
-        message.reply(itDetails.desc + "\nPress # to go back!👈").toString();
+        let itDetails = await fetchCourseDetails("IT",);
+        message.reply(itDetails)
         break;
 
       case "ICT":
-        let ictDetails = await fetchCourseDetails("ICT");
-        ictDetails = ictDetails[0];
-        message.reply(ictDetails.desc + "\nPress # to go back!👈").toString();
+        let ictDetails = await fetchCourseDetails("ICT",);
+        message.reply(ictDetails)
         break;
 
       case "ME":
-        let meDetails = await fetchCourseDetails("ME");
-        meDetails = meDetails[0];
-        message.reply(meDetails.desc + "\nPress # to go back!👈").toString();
+        let meDetails = await fetchCourseDetails("ME",);
+        message.reply(meDetails);
         break;
 
       case "CL":
-        let clDetails = await fetchCourseDetails("CL");
-        clDetails = clDetails[0];
-        message.reply(clDetails.desc + "\nPress # to go back!👈").toString();
+        let clDetails = await fetchCourseDetails("CL",);
+        message.reply(clDetails);
         break;
 
       case "#":
@@ -342,45 +362,49 @@ client.on("message", async (message) => {
         break;
 
       case "CE-P":
+        let cePapers = await fetchCourseDetails("CE",true);
         message.reply("Please wait while we are fetching the information...");
         setTimeout(() => {
-          message.reply(finalName.ce_papers + "\nPress # to go back!👈");
+          message.reply(cePapers);
         }, 3000);
         break;
 
       case "ME-P":
+        let mePapers = await fetchCourseDetails("ME",true);
         message.reply("Please wait while we are fetching the information...");
         setTimeout(() => {
-          message.reply(finalName.ce_papers + "\nPress # to go back!👈");
+          message.reply(mePapers);
         }, 3000);
         break;
 
       case "CL-P":
+        let clPapers = await fetchCourseDetails("CL",true);
         message.reply("Please wait while we are fetching the information...");
         setTimeout(() => {
-          message.reply(finalName.ce_papers + "\nPress # to go back!👈");
+          message.reply(clPapers);
         }, 3000);
         break;
 
-      case "CEM-P":
-        message.reply("Please wait while we are fetching the information...");
-        setTimeout(() => {
-          message.reply(finalName.ce_papers + "\nPress # to go back!👈");
-        }, 3000);
-        break;
+      // case "CEM-P":
+      //   message.reply("Please wait while we are fetching the information...");
+      //   setTimeout(() => {
+      //     message.reply(finalName.ce_papers + "\nPress # to go back!👈");
+      //   }, 3000);
+      //   break;
 
       case "IT-P":
+        let itPapers = await fetchCourseDetails("IT",true);
         message.reply("Please wait while we are fetching the information...");
         setTimeout(() => {
-          message.reply(finalName.ce_papers);
-          message.reply("Press # to go back!👈");
+          message.reply(itPapers);
         }, 3000);
         break;
 
       case "ICT-P":
+        let ictPapers = await fetchCourseDetails("ICT",true);
         message.reply("Please wait while we are fetching the information...");
         setTimeout(() => {
-          message.reply(finalName.ce_papers + "\nPress # to go back!👈");
+          message.reply(ictPapers);
         }, 3000);
         break;
 
